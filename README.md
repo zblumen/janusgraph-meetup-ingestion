@@ -1,2 +1,2 @@
-# janusgraph-meetup-ingestion
-A Basic Example of Ingesting Meetup Data Into JanusGraph
+# janusgraph-stackoverflow-ingestion
+A Basic Example of Ingesting Data Into JanusGraph
