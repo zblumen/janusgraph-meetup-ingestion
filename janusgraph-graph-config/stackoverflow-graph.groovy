@@ -12,7 +12,7 @@
 /////////////////////////////////////
 
 //set new graph name
-newGraphName = "stackoverflow_test";
+newGraphName = "stackoverflow_test0";
 
 //delete the graph (including storage tables and search index) if it already exists
 currentGraphNames = ConfiguredGraphFactory.getGraphNames();
@@ -26,11 +26,12 @@ mapConf = ConfiguredGraphFactory.getTemplateConfiguration()
 
 
 //Set graph specific table & search index
-map.put('storage.cql.keyspace', 'dev_janusgraph_' + newGraphName)
-map.put('index.search.index-name', 'dev_janusgraph_' + newGraphName)
+mapConf.put("graph.graphname", newGraphName)
+mapConf.put("storage.cql.keyspace", "dev_janusgraph_" + newGraphName)
+mapConf.put("index.search.index-name", "dev_janusgraph_" + newGraphName)
 
 //create the graph
-conf = new MapConfiguration(map)
+conf = new MapConfiguration(mapConf)
 ConfiguredGraphFactory.createConfiguration(conf)
 
 //get graph and management objects back to create schema
@@ -56,27 +57,27 @@ mgmt.makeEdgeLabel("AnswerIsForQuestion").multiplicity(MULTI).make()
 
 
 //Vertex Property Schema
-mgmt.makePropertyKey("UserName").dataType(Long.class).cardinality(org.janusgraph.core.Cardinality.SINGLE).make;
-mgmt.makePropertyKey("QuestionTitle").dataType(String.class).cardinality(org.janusgraph.core.Cardinality.SINGLE).make;
-mgmt.makePropertyKey("PostScore").dataType(Long.class).cardinality(org.janusgraph.core.Cardinality.SINGLE).make;
-mgmt.makePropertyKey("PostBody").dataType(String.class).cardinality(org.janusgraph.core.Cardinality.SINGLE).make;
-mgmt.makePropertyKey("PostTagList").dataType(String.class).cardinality(org.janusgraph.core.Cardinality.SET).make;
+mgmt.makePropertyKey("UserName").dataType(Long.class).cardinality(org.janusgraph.core.Cardinality.SINGLE).make();
+mgmt.makePropertyKey("QuestionTitle").dataType(String.class).cardinality(org.janusgraph.core.Cardinality.SINGLE).make();
+mgmt.makePropertyKey("PostScore").dataType(Long.class).cardinality(org.janusgraph.core.Cardinality.SINGLE).make();
+mgmt.makePropertyKey("PostBody").dataType(String.class).cardinality(org.janusgraph.core.Cardinality.SINGLE).make();
+mgmt.makePropertyKey("PostTagList").dataType(String.class).cardinality(org.janusgraph.core.Cardinality.SET).make();
 
 
 //Shared Property schema (properties that apply to both vertices and edges)
-mgmt.makePropertyKey("ElementLabel").dataType(String.class).cardinality(org.janusgraph.core.Cardinality.SINGLE).make;
+mgmt.makePropertyKey("ElementLabel").dataType(String.class).cardinality(org.janusgraph.core.Cardinality.SINGLE).make();
 
-mgmt.makePropertyKey("SourceId").dataType(String.class).cardinality(org.janusgraph.core.Cardinality.SINGLE).make;
-mgmt.makePropertyKey("SourceCreationDateTime").dataType(java.util.Date.class).cardinality(org.janusgraph.core.Cardinality.SINGLE).make;
-mgmt.makePropertyKey("SourceCloseDateTime").dataType(java.util.Date.class).cardinality(org.janusgraph.core.Cardinality.SINGLE).make;
+mgmt.makePropertyKey("SourceId").dataType(String.class).cardinality(org.janusgraph.core.Cardinality.SINGLE).make();
+mgmt.makePropertyKey("SourceCreationDateTime").dataType(java.util.Date.class).cardinality(org.janusgraph.core.Cardinality.SINGLE).make();
+mgmt.makePropertyKey("SourceCloseDateTime").dataType(java.util.Date.class).cardinality(org.janusgraph.core.Cardinality.SINGLE).make();
 
-mgmt.makePropertyKey("ElementCreationDateTime").dataType(java.util.Date.class).cardinality(org.janusgraph.core.Cardinality.SINGLE).make;
-mgmt.makePropertyKey("ElementUpdateDateTime").dataType(java.util.Date.class).cardinality(org.janusgraph.core.Cardinality.SINGLE).make;
+mgmt.makePropertyKey("ElementCreationDateTime").dataType(java.util.Date.class).cardinality(org.janusgraph.core.Cardinality.SINGLE).make();
+mgmt.makePropertyKey("ElementUpdateDateTime").dataType(java.util.Date.class).cardinality(org.janusgraph.core.Cardinality.SINGLE).make();
 
-mgmt.makePropertyKey("SourceDataTag").dataType(String.class).cardinality(org.janusgraph.core.Cardinality.SINGLE).make;
-mgmt.makePropertyKey("SourceDataUrl").dataType(String.class).cardinality(org.janusgraph.core.Cardinality.SINGLE).make;
-mgmt.makePropertyKey("SourceAnalysisTag").dataType(String.class).cardinality(org.janusgraph.core.Cardinality.SINGLE).make;
-mgmt.makePropertyKey("SourceAnalysisUrl").dataType(String.class).cardinality(org.janusgraph.core.Cardinality.SINGLE).make;
+mgmt.makePropertyKey("SourceDataTag").dataType(String.class).cardinality(org.janusgraph.core.Cardinality.SINGLE).make();
+mgmt.makePropertyKey("SourceDataUrl").dataType(String.class).cardinality(org.janusgraph.core.Cardinality.SINGLE).make();
+mgmt.makePropertyKey("SourceAnalysisTag").dataType(String.class).cardinality(org.janusgraph.core.Cardinality.SINGLE).make();
+mgmt.makePropertyKey("SourceAnalysisUrl").dataType(String.class).cardinality(org.janusgraph.core.Cardinality.SINGLE).make();
 
 
 
