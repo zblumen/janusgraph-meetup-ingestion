@@ -1,9 +1,10 @@
-from typing import Dict
+from typing import Dict, List
 from enum import Enum
 
 
+## To do typing should ho[pefully be nonQuated....eventually
 # corresponds to pandas types - object covers string, dicts, arrays, etc.
-class GraphPrepDataTypes(Enum):
+class GraphPrepDataTypeEnum(Enum):
     OBJECT = "object"
     INT64 = "int64"
     FLOAT64 = "float64"
@@ -11,33 +12,20 @@ class GraphPrepDataTypes(Enum):
     DATETIME64 = "datetime64"
 
 
-# Allowed Data types for vertex map prep
-graph_prep_data_types = GraphPrepDataTypes()
-
-# Type handling
-GraphElementStagingSchema = Dict[str, graph_prep_data_types]
-
 
 class GraphStagingSchema:
-    public: GraphElementStagingSchema
-    private: GraphElementStagingSchema
-    constants: GraphElementStagingSchema
+    properties: Dict[str, GraphPrepDataTypeEnum]
 
-    def __init__(self,
-                 public: GraphElementStagingSchema,
-                 private: GraphElementStagingSchema = None,
-                 constants: Dict = None
-                 ):
+    def __init__(self, schema: Dict[str, GraphPrepDataTypeEnum]):
+        self.properties = schema
 
-        self.public = public
-        self.private = private
-        self.constants = constants
-
-     def check_public_fields(self,fields:str):
-        keys = list(self.public.keys())
-        for field in fields:
-            if field not in keys:
-                raise RuntimeError(field + " is not in the public graph schema for this element")
-        for key in keys:
-            if key not in fields:
-                raise RuntimeError(key + " is a public property but isn't present in the provided row fields")
+    def check_property_fields(self, fields: List[str], exc: bool = True, inc: bool = True):
+        keys = list(self.properties.keys())
+        if exc:
+            for field in fields:
+                if field not in keys:
+                    raise RuntimeError(field + " is not in the public graph schema for this element")
+        if inc:
+            for key in keys:
+                if key not in fields:
+                    raise RuntimeError(key + " is a public property but isn't present in the provided row fields")
