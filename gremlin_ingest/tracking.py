@@ -1,33 +1,55 @@
-from . import schemas as sc
 import pandas as pd
-from typing import Dict
-from gremlin_python.process.anonymous_traversal import traversal
-from gremlin_python.driver.driver_remote_connection import DriverRemoteConnection
-from gremlin_python.process.graph_traversal import GraphTraversalSource
-from gremlin_python.process.graph_traversal import GraphTraversal
-from gremlin_python.statics import long
+from typing import Dict, List
+from enum import Enum
+
+
+class GraphPrepDataTypeEnum(Enum):
+    OBJECT = "object"
+    INT64 = "int64"
+    FLOAT64 = "float64"
+    BOOL = "bool"
+    DATETIME64 = "datetime64"
+
+
+class GraphStagingSchema:
+    properties: Dict[str, GraphPrepDataTypeEnum]
+
+    def __init__(self, schema: Dict[str, GraphPrepDataTypeEnum]):
+        self.properties = schema
+
+    def check_property_fields(self, fields: List[str], exc: bool = True, inc: bool = True):
+        keys = list(self.properties.keys())
+        if exc:
+            for field in fields:
+                if field not in keys:
+                    raise RuntimeError(field + " is not in the public graph schema for this element")
+        if inc:
+            for key in keys:
+                if key not in fields:
+                    raise RuntimeError(key + " is a public property but isn't present in the provided row fields")
+
 
 # Type handling
-VertexStagingSchemaMap = Dict[str, sc.GraphStagingSchema]
+VertexStagingSchemaMap = Dict[str, GraphStagingSchema]
 
 GraphElementStagingData = Dict[str, pd.DataFrame]
 VertexStagingDataMap = Dict[str, GraphElementStagingData]
 
 
-def instantiate_staging_data_frame(schema: sc.GraphStagingSchema) -> pd.DataFrame:
+def instantiate_staging_data_frame(schema: GraphStagingSchema) -> pd.DataFrame:
     return pd.DataFrame(columns=list(schema.properties.keys())).astype(schema)
 
 
 class GraphIngestTracker:
-    vertexTrackerSchema: sc.GraphStagingSchema
+    vertexTrackerSchema: GraphStagingSchema
     vertexTracker: pd.DataFrame
 
-    edgeTrackerSchema: sc.GraphStagingSchema
+    edgeTrackerSchema: GraphStagingSchema
     edgeTracker: pd.DataFrame
 
     def __init__(self,
-                 vertex_tracking_schema: sc.GraphStagingSchema,
-                 edge_tracking_schema: sc.GraphStagingSchema
+                 vertex_tracking_schema: GraphStagingSchema,
+                 edge_tracking_schema: GraphStagingSchema
                  ):
         # create vertex schema
         self.vertexTrackerSchema = vertex_tracking_schema
@@ -60,24 +82,3 @@ class GraphIngestTracker:
             self.edgeTrackerSchema.check_property_fields(list(properties.keys()))
 
         self.edgeTracker.loc[tracking_id] = properties
-
-
-def get_connection() -> GraphTraversalSource:
-    gremlin_service: str = input("Enter gremlin server (complete url)")
-    graph_name: str = input("Enter traversal source name")
-    conn = DriverRemoteConnection(gremlin_service, graph_name)
-    return traversal().withRemote(conn)
-
-
-def insert_vertex(g: GraphTraversalSource, label: str, properties: Dict) -> int:
-    vertex: GraphTraversal = g.addV(label)
-    for k, v in properties.items():
-        vertex.property(k, v)
-    return vertex.id().next()
-
-
-def insert_edge(g: GraphTraversalSource, from_gremlin_id: str, to_gremlin_id: str, label: str, properties: Dict):
-    edge: GraphTraversal = g.V(from_gremlin_id).to(g.V(to_gremlin_id))
-    for k, v in properties.items():
-        edge.property(k, v)
-    edge.iterate()
