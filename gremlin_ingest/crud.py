@@ -20,6 +20,13 @@ def insert_vertex(g: GraphTraversalSource, label: str, properties: Dict) -> int:
     return vertex.id().next()
 
 
+def update_vertex(g: GraphTraversalSource, gremlin_id: str, properties: Dict) -> int:
+    vertex: GraphTraversal = g.V(gremlin_id)
+    for k, v in properties.items():
+        vertex.property(k, v)
+    return vertex.id().next()
+
+
 def insert_edge(g: GraphTraversalSource, from_gremlin_id: str, to_gremlin_id: str, label: str, properties: Dict):
     edge: GraphTraversal = g.V(from_gremlin_id).to(g.V(to_gremlin_id))
     for k, v in properties.items():
