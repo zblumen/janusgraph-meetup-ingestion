@@ -49,11 +49,11 @@ def insert_user_vertex(
         row: pd.Series
 ) -> int:
     properties = {
-        "VertexLabel": "User",
+        "ElementLabel": "User",
         "SourceId": row["OwnerUserId"],
         "UserName": fake.name() + " Fakename",
-        "VertexCreationDateTime": datetime.now(),
-        "VertexUpdateDateTime": datetime.now()
+        "ElementCreationDateTime": datetime.now(),
+        "ElementUpdateDateTime": datetime.now()
     }
     ingest_tagger.tag(properties)
     gremlin_id = gc.insert_vertex(g, "User", properties)
@@ -69,15 +69,15 @@ def insert_question_vertex(
         row: pd.Series
 ) -> int:
     properties = {
-        "VertexLabel": "Question",
+        "ElementLabel": "Question",
         "SourceId": row["Id"],
-        "CreationDateTime": row["CreationDate"],
-        "CloseDateTime": row["CloseDate"],
+        "SourceCreationDateTime": row["CreationDate"],
+        "SourceCloseDateTime": row["CloseDate"],
         "PostScore": row["Score"],
         "QuestionTitle": row["Title"],
         "PostBody": row["Body"],
-        "VertexCreationDateTime": datetime.now(),
-        "VertexUpdateDateTime": datetime.now()
+        "ElementCreationDateTime": datetime.now(),
+        "ElementUpdateDateTime": datetime.now()
     }
     ingest_tagger.tag(properties)
     gremlin_id = gc.insert_vertex(g, "Question", properties)
@@ -91,13 +91,13 @@ def insert_answer_vertex(
         row: pd.Series
 ) -> int:
     properties = {
-        "VertexLabel": "Answer",
+        "ElementLabel": "Answer",
         "SourceId": row["Id"],
-        "CreationDateTime": row["CreationDate"],
+        "SourceCreationDateTime": row["CreationDate"],
         "PostScore": row["Score"],
         "PostBody": row["Body"],
-        "VertexCreationDateTime": datetime.now(),
-        "VertexUpdateDateTime": datetime.now()
+        "ElementCreationDateTime": datetime.now(),
+        "ElementUpdateDateTime": datetime.now()
     }
     ingest_tagger.tag(properties)
     return gc.insert_vertex(g, "Answer", properties)
@@ -111,10 +111,10 @@ def insert_question_vertex_from_answer_table(
         row: pd.Series
 ) -> int:
     properties = {
-        "VertexLabel": "Question",
+        "ElementLabel": "Question",
         "SourceId": row["ParentId"],
-        "VertexCreationDateTime": datetime.now(),
-        "VertexUpdateDateTime": datetime.now()
+        "ElementCreationDateTime": datetime.now(),
+        "ElementUpdateDateTime": datetime.now()
     }
     ingest_tagger.tag(properties)
     gremlin_id = gc.insert_vertex(g, "Question", properties)
@@ -130,11 +130,11 @@ def insert_question_vertex_from_tags_table(
         row: pd.Series
 ) -> int:
     properties = {
-        "VertexLabel": "Question",
+        "ElementLabel": "Question",
         "SourceId": row["Id"],
         "PostTagList": row["PostTagList"],
-        "VertexCreationDateTime": datetime.now(),
-        "VertexUpdateDateTime": datetime.now()
+        "ElementCreationDateTime": datetime.now(),
+        "ElementUpdateDateTime": datetime.now()
     }
     ingest_tagger.tag(properties)
     gremlin_id = gc.insert_vertex(g, "Question", properties)
@@ -151,12 +151,12 @@ def update_question_vertex(
         row: pd.Series
 ) -> int:
     properties = {
-        "CreationDateTime": row["CreationDate"],
-        "CloseDateTime": row["CloseDate"],
+        "SourceCreationDateTime": row["CreationDate"],
+        "SourceCloseDateTime": row["CloseDate"],
         "PostScore": row["Score"],
         "QuestionTitle": row["Title"],
         "PostBody": row["Body"],
-        "VertexUpdateDateTime": datetime.now()
+        "ElementUpdateDateTime": datetime.now()
     }
     ingest_tagger.tag(properties)
     return gc.update_vertex(g, gremlin_id, properties)
@@ -170,7 +170,7 @@ def update_question_vertex_tags(
 ) -> int:
     properties = {
         "PostTagList": row["PostTagList"],
-        "VertexUpdateDateTime": datetime.now()
+        "ElementUpdateDateTime": datetime.now()
     }
     ingest_tagger.tag(properties)
     return gc.update_vertex(g, gremlin_id, properties)
@@ -212,7 +212,7 @@ def ingest_stackoverflow_question(
         {
             "FromGremlinId": user_gremlin_id,
             "ToGremlinId": question_gremlin_id,
-            "EdgeLabel": "UserPostsQuestion"
+            "ElementLabel": "UserPostsQuestion"
         })
 
 
@@ -243,7 +243,7 @@ def ingest_stackoverflow_answer(
         {
             "FromGremlinId": user_gremlin_id,
             "ToGremlinId": answer_gremlin_id,
-            "EdgeLabel": "UserPostsAnswer"
+            "ElementLabel": "UserPostsAnswer"
         })
 
     # check if question has been ingested already
@@ -264,7 +264,7 @@ def ingest_stackoverflow_answer(
         {
             "FromGremlinId": answer_gremlin_id,
             "ToGremlinId": question_gremlin_id,
-            "EdgeLabel": "AnswerIsForQuestion"
+            "ElementLabel": "AnswerIsForQuestion"
         })
 
 
@@ -285,3 +285,13 @@ def ingest_stackoverflow_tag_list(
         # get gremlin id from tracker and update vertex
         question_gremlin_id = ingest_tracker.get_vertex(question_tracking_id)['GremlinId']
         update_question_vertex_tags(g, ingest_tagger, question_gremlin_id, row)
+
+
+# Instantiate ingest tracker
+vertexTrackingSchema = gt.GraphStagingSchema({"GremlinId":gt.GraphPrepDataTypeEnum.OBJECT})
+edgeTrackingSchema = gt.GraphStagingSchema({
+    "ToGremlinId": gt.GraphPrepDataTypeEnum.OBJECT,
+    "FromGremlinId": gt.GraphPrepDataTypeEnum.OBJECT,
+    "ElementLabel": gt.GraphPrepDataTypeEnum.OBJECT
+})
+ingestTracker = gt.GraphIngestTracker(vertexTrackingSchema, edgeTrackingSchema)
