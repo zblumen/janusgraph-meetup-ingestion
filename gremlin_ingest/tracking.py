@@ -65,7 +65,7 @@ class GraphIngestTracker:
     def get_vertex(self, tracking_id: str) -> Dict:
         return self.vertexTracker[tracking_id, :].to_dict()
 
-    def insert_vertex(self, tracking_id: str, properties: Dict, check_schema=True):
+    def insert_vertex_tracking(self, tracking_id: str, properties: Dict, check_schema=True):
         if check_schema:
             self.vertexTrackerSchema.check_property_fields(list(properties.keys()))
 
@@ -77,7 +77,7 @@ class GraphIngestTracker:
     def get_edge(self, tracking_id: str) -> Dict:
         return self.edgeTracker[tracking_id, :].to_dict()
 
-    def insert_edge(self, tracking_id: str, properties: Dict, check_schema=True):
+    def insert_edge_tracking(self, tracking_id: str, properties: Dict, check_schema=True):
         if check_schema:
             self.edgeTrackerSchema.check_property_fields(list(properties.keys()))
 

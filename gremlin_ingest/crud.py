@@ -3,6 +3,7 @@ from gremlin_python.driver.driver_remote_connection import DriverRemoteConnectio
 from gremlin_python.process.graph_traversal import GraphTraversalSource
 from gremlin_python.process.graph_traversal import GraphTraversal
 from gremlin_python.statics import long
+from typing import Dict
 
 
 def get_connection() -> GraphTraversalSource:
