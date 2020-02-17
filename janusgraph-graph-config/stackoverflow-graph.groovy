@@ -77,3 +77,12 @@ mgmt.makePropertyKey("SourceDataTag").dataType(String.class).cardinality(org.jan
 mgmt.makePropertyKey("SourceDataUrl").dataType(String.class).cardinality(org.janusgraph.core.Cardinality.SINGLE).make;
 mgmt.makePropertyKey("SourceAnalysisTag").dataType(String.class).cardinality(org.janusgraph.core.Cardinality.SINGLE).make;
 mgmt.makePropertyKey("SourceAnalysisUrl").dataType(String.class).cardinality(org.janusgraph.core.Cardinality.SINGLE).make;
+
+
+
+/////////////////////////////////////
+//commit and close
+/////////////////////////////////////
+
+mgmt.commit()
+:remote close
