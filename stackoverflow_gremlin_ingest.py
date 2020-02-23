@@ -6,7 +6,6 @@ import gremlin_ingest.crud as gc
 from gremlin_python.process.graph_traversal import GraphTraversalSource
 from datetime import datetime
 
-
 # General classes and Utils
 
 fake = Faker
@@ -288,7 +287,9 @@ def ingest_stackoverflow_tag_list(
 
 
 # Instantiate ingest tracker
-vertexTrackingSchema = gt.GraphStagingSchema({"GremlinId":gt.GraphPrepDataTypeEnum.OBJECT})
+vertexTrackingSchema = gt.GraphStagingSchema({
+    "GremlinId": gt.GraphPrepDataTypeEnum.OBJECT
+})
 edgeTrackingSchema = gt.GraphStagingSchema({
     "ToGremlinId": gt.GraphPrepDataTypeEnum.OBJECT,
     "FromGremlinId": gt.GraphPrepDataTypeEnum.OBJECT,

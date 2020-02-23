@@ -37,7 +37,14 @@ VertexStagingDataMap = Dict[str, GraphElementStagingData]
 
 
 def instantiate_staging_data_frame(schema: GraphStagingSchema) -> pd.DataFrame:
-    return pd.DataFrame(columns=list(schema.properties.keys())).astype(schema)
+    pd_schema = dict(
+        map(
+            lambda x: (x[0], x[1].value),
+            schema.properties.items()
+        )
+    )
+
+    return pd.DataFrame(columns=list(schema.properties.keys())).astype(pd_schema)
 
 
 class GraphIngestTracker:
